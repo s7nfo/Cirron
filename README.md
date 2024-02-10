@@ -1,6 +1,6 @@
 # Cirron
 
-Cirron measures how many instruction a piece of Python code executes. It uses the Linux perf events interface.
+Cirron measures a piece of Python code and report back several performance counters: CPU instruction count, branch misses, page faults and time spent measuring. It uses the Linux perf events interface.
 
 ## Prerequisites
 
