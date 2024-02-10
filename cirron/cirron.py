@@ -13,15 +13,23 @@ from subprocess import call
 
 class Counter(Structure):
     _fields_ = [
-        ("instruction_count", c_uint64),
         ("time_enabled_ns", c_uint64),
+        ("instruction_count", c_uint64),
+        ("branch_misses", c_uint64),
+        ("page_faults", c_uint64),
     ]
 
     def __str__(self):
-        return f"Counter(instruction_count={self.instruction_count}, time_enabled_ns={self.time_enabled_ns})"
+        return self.__repr__()
 
     def __repr__(self):
-        return f"Counter(instruction_count={self.instruction_count}, time_enabled_ns={self.time_enabled_ns})"
+        repr = "Counter("
+
+        for field, _ in Counter._fields_:
+            repr += f"{field}={getattr(self, field)}, "
+        repr = repr[:-2] + ")"
+
+        return repr
 
 
 lib_path = resource_filename(__name__, "cirronlib.so")
@@ -55,4 +63,29 @@ class Collector:
         ret_val = cirron_lib.end(self.fd, byref(self.counter))
         if ret_val == -1:
             raise Exception("Failed to end collector.")
+
+        global overhead
+        if overhead:
+            for field, _ in Counter._fields_:
+                setattr(
+                    self.counter, field, getattr(self.counter, field) - overhead[field]
+                )
         return self.counter
+
+
+# We try to estimate what the overhead of the collector is, taking the minimum
+# of 10 runs.
+overhead = {}
+collector = Collector()
+o = {}
+for _ in range(10):
+    collector.start()
+    collector.end()
+
+    for field, _ in Counter._fields_:
+        if field not in overhead:
+            o[field] = getattr(collector.counter, field)
+        else:
+            o[field] = min(overhead[field], getattr(collector.counter, field))
+overhead = o
+del collector
