@@ -5,6 +5,6 @@ setup(
     version="0.2",
     packages=["cirron"],
     package_data={
-        "cirron": ["cirronlib.c"],
+        "cirron": ["cirronlib.cpp"],
     },
 )

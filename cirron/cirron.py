@@ -34,11 +34,13 @@ class Counter(Structure):
 
 lib_path = resource_filename(__name__, "cirronlib.so")
 if not os.path.exists(lib_path):
-    source_path = resource_filename(__name__, "cirronlib.c")
-    exit_status = call(f"gcc -shared -fPIC -o {lib_path} {source_path}", shell=True)
+    source_path = resource_filename(__name__, "cirronlib.cpp")
+    exit_status = call(
+        f"c++ -std=c++17 -O3 -shared -fPIC -o {lib_path} {source_path}", shell=True
+    )
     if exit_status != 0:
         raise Exception(
-            "Failed to compile cirronlib.c, make sure you have gcc installed."
+            "Failed to compile cirronlib.cpp, make sure you have 'c++' installed."
         )
 
 cirron_lib = CDLL(lib_path)
@@ -67,9 +69,15 @@ class Collector:
         global overhead
         if overhead:
             for field, _ in Counter._fields_:
-                setattr(
-                    self.counter, field, getattr(self.counter, field) - overhead[field]
-                )
+                # Clamp the result of overhead substraction to 0.
+                if getattr(self.counter, field) > overhead[field]:
+                    setattr(
+                        self.counter,
+                        field,
+                        getattr(self.counter, field) - overhead[field],
+                    )
+                else:
+                    setattr(self.counter, field, 0)
         return self.counter
 
 

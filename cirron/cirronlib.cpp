@@ -237,6 +237,8 @@ int start()
         printf("Failed get thread counters before: %d.\n", ret);
         return 1;
     }
+
+    return 0;
 #endif
 }
 
