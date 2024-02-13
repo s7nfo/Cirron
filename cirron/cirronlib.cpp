@@ -128,7 +128,7 @@ int start()
     // load pmc db
     int ret = 0;
     kpep_db *db = NULL;
-    if ((ret = kpep_db_create("a14", &db)))
+    if ((ret = kpep_db_create(NULL, &db)))
     {
         printf("Error: cannot load pmc database: %d.\n", ret);
         return 1;
@@ -313,9 +313,9 @@ int end(int fd, struct counter *out)
     kpc_force_all_ctrs_set(0);
 
     out->time_enabled_ns = 0;
-    out->instruction_count = counters_1[1] - counters_0[1];
+    out->instruction_count = counters_1[counter_map[1]] - counters_0[counter_map[1]];
     out->page_faults = 0;
-    out->branch_misses = counters_1[3] - counters_0[3];
+    out->branch_misses = counters_1[counter_map[3]] - counters_0[counter_map[3]];
     return 0;
 #endif
 }
