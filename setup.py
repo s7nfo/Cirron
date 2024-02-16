@@ -5,6 +5,6 @@ setup(
     version="0.2",
     packages=["cirron"],
     package_data={
-        "cirron": ["cirronlib.cpp", "apple_arm_events.h"],
+        "cirron": ["cirronlib.cpp", "apple_arm_events.h", "tracer.py", "cirron.py"],
     },
 )

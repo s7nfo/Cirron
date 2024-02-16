@@ -43,26 +43,26 @@ if not os.path.exists(lib_path):
             "Failed to compile cirronlib.cpp, make sure you have 'c++' installed."
         )
 
-cirron_lib = CDLL(lib_path)
-cirron_lib.start.argtypes = None
-cirron_lib.start.restype = c_int
-cirron_lib.end.argtypes = [c_int, POINTER(Counter)]
-cirron_lib.end.restype = None
-
 
 class Collector:
+    cirron_lib = CDLL(lib_path)
+    cirron_lib.start.argtypes = None
+    cirron_lib.start.restype = c_int
+    cirron_lib.end.argtypes = [c_int, POINTER(Counter)]
+    cirron_lib.end.restype = None
+
     def __init__(self):
         self.fd = None
         self.counter = Counter()
 
     def start(self):
-        ret_val = cirron_lib.start()
+        ret_val = Collector.cirron_lib.start()
         if ret_val == -1:
             raise Exception("Failed to start collector.")
         self.fd = ret_val
 
     def end(self):
-        ret_val = cirron_lib.end(self.fd, byref(self.counter))
+        ret_val = Collector.cirron_lib.end(self.fd, byref(self.counter))
         if ret_val == -1:
             raise Exception("Failed to end collector.")
 
