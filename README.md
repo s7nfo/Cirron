@@ -16,7 +16,7 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/s7nfo/Cirron.git
-pip install ./cirron
+pip install ./Cirron
 ```
 
 The Python wrapper automatically compiles the C++ library (cirronlib.cpp) on first use.
