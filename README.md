@@ -53,7 +53,7 @@ tracer.start()
 # ...
 
 # Stop collecting and retrieve the trace
-trace = tracer.end()
+trace = tracer.stop()
 print(trace)
 
 # Save the trace for ingesting to Perfetto
