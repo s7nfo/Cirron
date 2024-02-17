@@ -27,34 +27,25 @@ The Python wrapper automatically compiles the C++ library (cirronlib.cpp) on fir
 ```
 from cirron import Collector
 
-collector = Collector()
-
 # Start collecting performance metrics
-collector.start()
+with Collector() as collector:
+    # Your code here
+    # ...
 
-# Your code here
-# ...
-
-# Stop collecting and retrieve the metrics
-metrics = collector.end()
-print(metrics)
+# Retrieve the metrics
+print(collector.counters)
 ```
 
 ### Syscalls
 ```
 from cirron import Tracer, to_tef
 
-tracer = Tracer()
-
-# Start syscall trace
-tracer.start()
-
-# Your code here
-# ...
+with Tracer() as tracer:
+    # Your code here
+    # ...
 
 # Stop collecting and retrieve the trace
-trace = tracer.end()
-print(trace)
+print(tracer.trace)
 
 # Save the trace for ingesting to Perfetto
 open("/tmp/trace", "w").write(to_tef(trace))
