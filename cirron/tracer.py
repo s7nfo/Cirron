@@ -131,23 +131,23 @@ def parse_strace(f):
 
 
 class Tracer:
-    def start(self):
+    def __enter__(self):
         parent_pid = os.getpid()
-        self.trace_file = tempfile.mktemp()
+        self._trace_file = tempfile.mktemp()
 
-        cmd = f"strace --quiet=attach,exit -f -T -ttt -o {self.trace_file} -p {parent_pid}".split()
-        self.strace_proc = subprocess.Popen(cmd)
+        cmd = f"strace --quiet=attach,exit -f -T -ttt -o {self._trace_file} -p {parent_pid}".split()
+        self._strace_proc = subprocess.Popen(cmd)
 
-        while not os.path.exists(self.trace_file):
+        while not os.path.exists(self._trace_file):
             pass
 
-    def stop(self):
-        self.strace_proc.terminate()
-        self.strace_proc.wait()
+        return self
 
-        with open(self.trace_file, "r") as f:
-            parsed_output = parse_strace(f)
+    def __exit__(self, exc_type, exc_value, traceback):
+        self._strace_proc.terminate()
+        self._strace_proc.wait()
 
-        os.unlink(self.trace_file)
+        with open(self._trace_file, "r") as f:
+            self.trace = parse_strace(f)
 
-        return parsed_output
+        os.unlink(self._trace_file)

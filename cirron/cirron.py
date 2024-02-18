@@ -52,17 +52,19 @@ class Collector:
     cirron_lib.end.restype = None
 
     def __init__(self):
-        self.fd = None
-        self.counter = Counter()
+        self._fd = None
+        self.counters = Counter()
 
-    def start(self):
+    def __enter__(self):
         ret_val = Collector.cirron_lib.start()
         if ret_val == -1:
             raise Exception("Failed to start collector.")
-        self.fd = ret_val
+        self._fd = ret_val
 
-    def end(self):
-        ret_val = Collector.cirron_lib.end(self.fd, byref(self.counter))
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        ret_val = Collector.cirron_lib.end(self._fd, byref(self.counters))
         if ret_val == -1:
             raise Exception("Failed to end collector.")
 
@@ -70,15 +72,14 @@ class Collector:
         if overhead:
             for field, _ in Counter._fields_:
                 # Clamp the result of overhead substraction to 0.
-                if getattr(self.counter, field) > overhead[field]:
+                if getattr(self.counters, field) > overhead[field]:
                     setattr(
-                        self.counter,
+                        self.counters,
                         field,
-                        getattr(self.counter, field) - overhead[field],
+                        getattr(self.counters, field) - overhead[field],
                     )
                 else:
-                    setattr(self.counter, field, 0)
-        return self.counter
+                    setattr(self.counters, field, 0)
 
 
 # We try to estimate what the overhead of the collector is, taking the minimum
@@ -87,13 +88,13 @@ overhead = {}
 collector = Collector()
 o = {}
 for _ in range(10):
-    collector.start()
-    collector.end()
+    with Collector() as collector:
+        pass
 
     for field, _ in Counter._fields_:
         if field not in overhead:
-            o[field] = getattr(collector.counter, field)
+            o[field] = getattr(collector.counters, field)
         else:
-            o[field] = min(overhead[field], getattr(collector.counter, field))
+            o[field] = min(overhead[field], getattr(collector.counters, field))
 overhead = o
 del collector
