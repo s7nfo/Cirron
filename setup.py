@@ -1,8 +1,13 @@
 from setuptools import setup, find_packages
 
+# Read the contents of your README file
+from pathlib import Path
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
+
 setup(
     name="Cirron",
-    version="0.2",
+    version="0.2.1",
     packages=find_packages(),
     package_data={
         "cirron": ["cirronlib.cpp", "apple_arm_events.h", "tracer.py", "cirron.py"],
@@ -10,6 +15,8 @@ setup(
     author="Matt Stuchlik",
     author_email="matej.stuchlik@gmail.com",
     description="Cirron measures how many CPU instructions and system calls a piece of Python code executes.",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     url="https://github.com/s7nfo/Cirron",
     classifiers=[
         "Programming Language :: Python :: 3",
