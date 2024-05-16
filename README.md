@@ -12,11 +12,8 @@ It can also trace syscalls using `strace`, Linux only!
 
 ## Installation
 
-Clone the repository:
-
 ```bash
-git clone https://github.com/s7nfo/Cirron.git
-pip install ./Cirron
+pip install cirron
 ```
 
 The Python wrapper automatically compiles the C++ library (cirronlib.cpp) on first use.
