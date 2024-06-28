@@ -1,0 +1,62 @@
+Metadata-Version: 2.1
+Name: Cirron
+Version: 0.2.1
+Summary: Cirron measures how many CPU instructions and system calls a piece of Python code executes.
+Home-page: https://github.com/s7nfo/Cirron
+Author: Matt Stuchlik
+Author-email: matej.stuchlik@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+
+# Cirron
+
+Cirron measures a piece of Python code and report back several performance counters: CPU instruction count, branch misses, page faults and time spent measuring. It uses the Linux perf events interface or @ibireme's [KPC demo](https://gist.github.com/ibireme/173517c208c7dc333ba962c1f0d67d12) on OSX.
+
+It can also trace syscalls using `strace`, Linux only!
+
+## Prerequisites
+
+- Linux with perf events support / Apple ARM OSX
+- C++
+- Python 3.x
+
+## Installation
+
+```bash
+pip install cirron
+```
+
+The Python wrapper automatically compiles the C++ library (cirronlib.cpp) on first use.
+
+## Usage
+
+### Performance Counters
+```
+from cirron import Collector
+
+# Start collecting performance metrics
+with Collector() as collector:
+    # Your code here
+    # ...
+
+# Retrieve the metrics
+print(collector.counters)
+```
+
+### Syscalls
+```
+from cirron import Tracer, to_tef
+
+with Tracer() as tracer:
+    # Your code here
+    # ...
+
+# Stop collecting and retrieve the trace
+print(tracer.trace)
+
+# Save the trace for ingesting to Perfetto
+open("/tmp/trace", "w").write(to_tef(trace))
+```
