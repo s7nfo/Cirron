@@ -67,8 +67,8 @@ def to_tef(parsed_events)
 end
 
 def parse_strace(file)
-  syscall_pattern = /^(\d+) (\d+\.\d+) (\w+)\((.*?)\) += +(.*?) <(.*?)>$/
-  signal_pattern = /^(\d+) (\d+\.\d+) --- (\w+) {(.*)} ---$/
+  syscall_pattern = /^(\d+) +(\d+\.\d+) (\w+)\((.*?)\) += +(.*?) <(.*?)>$/
+  signal_pattern = /^(\d+) +(\d+\.\d+) --- (\w+) {(.*)} ---$/
   unfinished_pattern = /^(\d+) (\d+\.\d+) (\w+)\((.*?) +<unfinished \.\.\.>$/
   resumed_pattern = /^(\d+) (\d+\.\d+) <\.\.\. (\w+) resumed>(.*?)?\) += +(.*?) <(.*?)>$/
 

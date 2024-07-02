@@ -66,7 +66,9 @@ class Signal:
 
 
 def parse_strace(f):
-    syscall_pattern = re.compile(r"^(\d+) +(\d+\.\d+) (\w+)\((.*?)\) += +(.*?) <(.*?)>$")
+    syscall_pattern = re.compile(
+        r"^(\d+) +(\d+\.\d+) (\w+)\((.*?)\) += +(.*?) <(.*?)>$"
+    )
     signal_pattern = re.compile(r"^(\d+) +(\d+\.\d+) --- (\w+) {(.*)} ---$")
     unfinished_pattern = re.compile(
         r"^(\d+) (\d+\.\d+) (\w+)\((.*?) +<unfinished \.\.\.>$"
@@ -140,6 +142,8 @@ class Tracer:
 
         while not os.path.exists(self._trace_file):
             pass
+
+        print(0)
 
         return self
 
