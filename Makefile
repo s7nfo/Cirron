@@ -14,4 +14,4 @@ test-python:
 .PHONY: test-ruby
 test-ruby:
 	@echo "Running Ruby tests..."
-	cd ruby && ruby -Ilib:test tests/tests.rb
+	cd ruby && budle exec ruby -Ilib:test tests/tests.rb
