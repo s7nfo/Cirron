@@ -143,8 +143,6 @@ class Tracer:
         while not os.path.exists(self._trace_file):
             pass
 
-        print(0)
-
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):

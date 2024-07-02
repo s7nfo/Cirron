@@ -7,9 +7,7 @@ from cirron import Tracer, Collector
 class Test(unittest.TestCase):
     def test_tracer(self):
         with Tracer() as t:
-            for _ in range(10):
-                print(0)
-        print(t.trace)
+            os.write(1, b"Hello\n")
 
         self.assertEqual(len(t.trace), 3)
 
