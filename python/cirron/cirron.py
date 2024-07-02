@@ -54,17 +54,16 @@ class Collector:
     cirron_lib.end.argtypes = [c_int, POINTER(Counter)]
     cirron_lib.end.restype = None
 
-    def __init__(self):
+    def __init__(self, measure_overhead=True):
         self._fd = None
         self.counters = Counter()
 
         # We try to estimate what the overhead of the collector is, taking the minimum
         # of 10 runs.
         global overhead
-        if not overhead:
-            collector = Collector()
+        if measure_overhead and not overhead:
             for _ in range(10):
-                with Collector() as collector:
+                with Collector(measure_overhead=False) as collector:
                     pass
 
                 for field, _ in Counter._fields_:
