@@ -19,4 +19,4 @@ jobs:
         python-version: '3.11'  # Specify the Python version you need
 
     - name: Run tests
-      run: make test-python
+      run: sudo make test-python
