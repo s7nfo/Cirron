@@ -4,7 +4,7 @@ require_relative '../lib/cirron'
 
 class TestCirron < Minitest::Test
   def test_tracer
-    t = Tracer.new
+    t = Cirron::Tracer.new
     t.trace do
       Tempfile.create('test') do |f|
         f.write('test')
@@ -19,7 +19,7 @@ class TestCirron < Minitest::Test
       skip 'As of 02/07/2024, GitHub Actions does not support perf_event_open.'
     end
 
-    c = Collector.new
+    c = Cirron::Collector.new
     c.collect do
       puts 0
     end
