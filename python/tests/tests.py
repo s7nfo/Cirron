@@ -2,9 +2,6 @@ import unittest
 import os
 from cirron import Tracer, Collector
 
-IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
-
-
 class Test(unittest.TestCase):
     def test_tracer(self):
         with Tracer() as t:
@@ -12,7 +9,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(t.trace), 3)
 
-    @unittest.skipIf(IN_GITHUB_ACTIONS, "As of 02/07/2024, GitHub Actions does not support perf_event_open.")
+    @unittest.skipIf("GITHUB_ACTIONS" in os.environ, "As of 02/07/2024, GitHub Actions does not support perf_event_open.")
     def test_collector(self):
         with Collector() as c:
             print(0)
