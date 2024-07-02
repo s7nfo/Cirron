@@ -66,8 +66,10 @@ class Signal:
 
 
 def parse_strace(f):
-    syscall_pattern = re.compile(r"^(\d+) (\d+\.\d+) (\w+)\((.*?)\) += +(.*?) <(.*?)>$")
-    signal_pattern = re.compile(r"^(\d+) (\d+\.\d+) --- (\w+) {(.*)} ---$")
+    syscall_pattern = re.compile(
+        r"^(\d+) +(\d+\.\d+) (\w+)\((.*?)\) += +(.*?) <(.*?)>$"
+    )
+    signal_pattern = re.compile(r"^(\d+) +(\d+\.\d+) --- (\w+) {(.*)} ---$")
     unfinished_pattern = re.compile(
         r"^(\d+) (\d+\.\d+) (\w+)\((.*?) +<unfinished \.\.\.>$"
     )
