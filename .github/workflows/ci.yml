@@ -20,5 +20,3 @@ jobs:
 
     - name: Run tests
       run: sudo make test-python
-      env:
-        GITHUB_ACTIONS: true
