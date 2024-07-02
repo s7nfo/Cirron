@@ -7,7 +7,8 @@ from cirron import Tracer, Collector
 class Test(unittest.TestCase):
     def test_tracer(self):
         with Tracer() as t:
-            os.write(1, b"Hello\n")
+            with open("/tmp/test", "w") as f:
+                f.write("test")
 
         self.assertEqual(len(t.trace), 3)
 
