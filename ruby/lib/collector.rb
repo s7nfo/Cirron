@@ -1,9 +1,19 @@
 require 'ffi'
 
-module CirronInterOp 
+module CirronInterop
   extend FFI::Library
 
-  ffi_lib './cirronlib.so'
+  lib_path = File.join(__dir__, 'cirronlib.so')
+  source_path = File.join(__dir__, 'cirronlib.cpp')
+
+  unless File.exist?(lib_path)
+    exit_status = system("c++ -std=c++17 -O3 -shared -fPIC -o #{lib_path} #{source_path}")
+    if exit_status.nil? || !exit_status
+      raise "Failed to compile cirronlib.cpp, make sure you have 'c++' installed."
+    end
+  end
+
+  ffi_lib lib_path
   attach_function :start, [], :int
   attach_function :end, [:int, :pointer], :int
 end
