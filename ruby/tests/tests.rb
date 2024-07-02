@@ -11,7 +11,7 @@ class TestCirron < Minitest::Test
       end
     end
 
-    assert_equal 9, t.trace.size
+    assert_equal 10, t.trace.size
   end
 
   def test_collector
