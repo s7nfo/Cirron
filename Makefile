@@ -14,7 +14,7 @@ test-python:
 .PHONY: test-ruby
 test-ruby:
 	@echo "Running Ruby tests..."
-	cd ruby
-	gem install bundler
-	bundle install
+	cd ruby && \
+	gem install bundler && \
+	bundle install && \
 	sudo bundle exec ruby -Ilib:test tests/tests.rb
