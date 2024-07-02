@@ -10,7 +10,7 @@ class Test(unittest.TestCase):
             with open("/tmp/test", "w") as f:
                 f.write("test")
 
-        self.assertEqual(len(t.trace), 3)
+        self.assertEqual(len(t.trace), 9)
 
     @unittest.skipIf(
         os.getenv("POWERSHELL_DISTRIBUTION_CHANNEL").startswith(
