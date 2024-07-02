@@ -15,7 +15,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.11'  # Specify the Python version you need
+        python-version: '3.11'
 
     - name: Run tests
-      run: sudo make test-python
+      run: sudo make test
