@@ -8,7 +8,7 @@ test: test-python test-ruby
 .PHONY: test-python
 test-python:
 	@echo "Running Python tests..."
-	sudo PYTHONPATH=./python python -m unittest discover -s python/tests
+	PYTHONPATH=./python python -m unittest discover -s python/tests
 
 # Ruby test target
 .PHONY: test-ruby
