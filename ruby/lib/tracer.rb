@@ -75,7 +75,6 @@ def parse_strace(file)
   unfinished_syscalls = {}
 
   file.each_line do |line|
-    puts line
     case line
     when syscall_pattern
       pid, timestamp, syscall, args, retval, duration = $~.captures
@@ -126,10 +125,12 @@ module Cirron
 
         yield if block_given?
       ensure
+        sleep 1
         Process.kill('INT', strace_proc) rescue nil
         Process.wait(strace_proc) rescue nil
       end
 
+      puts trace_file.path
       result = File.open(trace_file.path, 'r') do |file|
         parse_strace(file)
       end
