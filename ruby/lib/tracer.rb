@@ -110,11 +110,9 @@ module Cirron
       trace_file = Tempfile.new('cirron')
       trace_file.close
       parent_pid = Process.pid
-      puts parent_pid
       cmd = "strace --quiet=attach,exit -f -T -ttt -o #{trace_file.path} -p #{parent_pid}"
       
       strace_proc = spawn(cmd, :out => "/dev/null", :err => "/dev/null")
-      puts strace_proc
       
       deadline = Time.now + timeout
       begin
@@ -124,18 +122,12 @@ module Cirron
           end
         end
 
-        puts block_given?
-        sleep 1
-
         yield if block_given?
       ensure
-        sleep 1
         Process.kill('INT', strace_proc) rescue nil
         Process.wait(strace_proc) rescue nil
       end
 
-      puts "WAT\n"
-      puts trace_file.path
       result = File.open(trace_file.path, 'r') do |file|
         parse_strace(file)
       end
