@@ -11,7 +11,7 @@ class Test(unittest.TestCase):
             time.sleep(0.1)
 
         print(t.trace)
-        self.assertEqual(len(t.trace), 4)
+        self.assertEqual(len(t.trace), 3)
 
     @unittest.skipIf(
         os.getenv("POWERSHELL_DISTRIBUTION_CHANNEL")

@@ -9,3 +9,6 @@ __pycache__/
 dist/
 build/
 *.pyd
+
+.DS_Store
+Gemfile.lock
