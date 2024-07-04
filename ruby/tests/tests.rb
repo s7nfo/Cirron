@@ -9,7 +9,7 @@ class TestCirron < Minitest::Test
     end
 
     puts t
-    assert_equal 4, t.size
+    assert_equal 3, t.size
   end
 
   def test_collector

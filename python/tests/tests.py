@@ -10,7 +10,6 @@ class Test(unittest.TestCase):
         with Tracer() as t:
             time.sleep(0.1)
 
-        print(t.trace)
         self.assertEqual(len(t.trace), 3)
 
     @unittest.skipIf(
@@ -24,5 +23,4 @@ class Test(unittest.TestCase):
         with Collector() as c:
             time.sleep(0.1)
 
-        print(c.counters)
         self.assertGreater(c.counters.instruction_count, 0)
