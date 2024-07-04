@@ -11,6 +11,7 @@ class TestCirron < Minitest::Test
       end
     end
 
+    puts t
     assert_equal 4, t.size
   end
 
