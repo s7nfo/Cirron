@@ -4,13 +4,13 @@ require_relative '../lib/cirron'
 
 class TestCirron < Minitest::Test
   def test_tracer
-    Cirron::Tracer.trace do
+    t = Cirron::Tracer.trace do
       Tempfile.create('test') do |f|
         f.write('test')
       end
     end
 
-    assert_equal 10, t.trace.size
+    assert_equal 10, t.size
   end
 
   def test_collector
@@ -18,10 +18,10 @@ class TestCirron < Minitest::Test
       skip 'As of 02/07/2024, GitHub Actions does not support perf_event_open.'
     end
 
-    Cirron::Collector.collect do
+    c = Cirron::collector do
       puts 0
     end
 
-    assert_operator c.counters.time_enabled_ns, :>, 0
+    assert_operator c[:time_enabled_ns], :>, 0
   end
 end

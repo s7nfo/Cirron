@@ -1,6 +1,6 @@
 require 'ffi'
 
-module CirronInterop
+module CirronInterOp
   extend FFI::Library
 
   lib_path = File.join(__dir__, 'cirronlib.so')
@@ -27,7 +27,7 @@ end
 
 module Cirron
   def self.start
-    ret_val = CirronInternOp.start
+    ret_val = CirronInterOp.start
     if ret_val == -1
       raise "Failed to start collector"
     end
@@ -35,7 +35,7 @@ module Cirron
   end
 
   def self.end(fd, counter)
-    CirronInternOp.end(fd, counter)
+    CirronInterOp.end(fd, counter)
   end
 
   def self.collector(&blk)

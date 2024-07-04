@@ -1,5 +1,4 @@
 require 'tempfile'
-require 'open3'
 require 'json'
 
 class Syscall
@@ -76,6 +75,7 @@ def parse_strace(file)
   unfinished_syscalls = {}
 
   file.each_line do |line|
+    puts line
     case line
     when syscall_pattern
       pid, timestamp, syscall, args, retval, duration = $~.captures
@@ -106,25 +106,38 @@ def parse_strace(file)
 end
 
 module Cirron
-    class Tracer
-        def self.trace(&block)
-        trace_file = Tempfile.new('tracer')
-        trace_file.close
-        parent_pid = Process.pid
-        cmd = "strace --quiet=attach,exit -f -T -ttt -o #{trace_file.path} -p #{parent_pid}"
-        
-        strace_proc = spawn(cmd, :out => "/dev/null", :err => "/dev/null")
-        
-        Process.detach(strace_proc)
-        sleep(0.1) until File.exist?(trace_file.path) && !File.zero?(trace_file.path)
+  class Tracer
+    def self.trace(timeout = 10, &block)
+      trace_file = Tempfile.new('cirron')
+      trace_file.close
+      parent_pid = Process.pid
+      cmd = "strace --quiet=attach,exit -f -T -ttt -o #{trace_file.path} -p #{parent_pid}"
+      puts cmd
+      
+      strace_proc = spawn(cmd, :out => "/dev/null", :err => "/dev/null")
+      
+      Process.detach(strace_proc)
+      
+      deadline = Time.now + timeout
+      begin
+        until File.exist?(trace_file.path)
+          if Time.now > deadline
+            raise Timeout::Error, "Failed to start strace within #{timeout}s."
+          end
+          sleep 0.1
+        end
+
         yield if block_given?
-        Process.kill('TERM', strace_proc)
-        Process.wait(strace_proc)
-        trace = File.open(trace_file.path, 'r') do |file|
-            parse_strace(file)
-        end
-        trace_file.unlink
-        trace
-        end
+      ensure
+        Process.kill('INT', strace_proc) rescue nil
+        Process.wait(strace_proc) rescue nil
+      end
+
+      trace = File.open(trace_file.path, 'r') do |file|
+        parse_strace(file)
+      end
+      trace_file.unlink
+      trace
     end
+  end
 end

@@ -3,6 +3,7 @@ import os
 import subprocess
 import re
 import json
+import time
 from dataclasses import dataclass
 
 
@@ -133,15 +134,18 @@ def parse_strace(f):
 
 
 class Tracer:
-    def __enter__(self):
+    def __enter__(self, timeout=10):
         parent_pid = os.getpid()
         self._trace_file = tempfile.mktemp()
 
         cmd = f"strace --quiet=attach,exit -f -T -ttt -o {self._trace_file} -p {parent_pid}".split()
         self._strace_proc = subprocess.Popen(cmd)
 
+        deadline = time.monotonic() + timeout
         while not os.path.exists(self._trace_file):
-            pass
+            if time.monotonic() > deadline:
+                raise TimeoutError(f"Failed to start strace within {timeout}s.")
+            time.sleep(0.1)
 
         return self
 
