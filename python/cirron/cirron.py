@@ -77,7 +77,9 @@ class Collector:
     def __enter__(self):
         ret_val = Collector.cirron_lib.start()
         if ret_val == -1:
-            raise Exception("Failed to start collector. Make sure you have the right permissions, you might need to use sudo.")
+            raise Exception(
+                "Failed to start collector. Make sure you have the right permissions, you might need to use sudo."
+            )
         self._fd = ret_val
 
         return self

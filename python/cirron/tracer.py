@@ -145,7 +145,6 @@ class Tracer:
         while not os.path.exists(self._trace_file):
             if time.monotonic() > deadline:
                 raise TimeoutError(f"Failed to start strace within {timeout}s.")
-            time.sleep(0.1)
 
         return self
 

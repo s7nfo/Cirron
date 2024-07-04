@@ -124,7 +124,6 @@ module Cirron
           if Time.now > deadline
             raise Timeout::Error, "Failed to start strace within #{timeout}s."
           end
-          sleep 0.1
         end
 
         yield if block_given?
