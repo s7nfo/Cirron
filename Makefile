@@ -17,4 +17,4 @@ test-ruby:
 	cd ruby && \
 	gem install bundler && \
 	bundle install && \
-	bundle exec ruby -Ilib:test tests/tests.rb
+	sudo bundle exec ruby -Ilib:test tests/tests.rb
