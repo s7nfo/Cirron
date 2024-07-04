@@ -110,6 +110,7 @@ module Cirron
       trace_file = Tempfile.new('cirron')
       trace_file.close
       parent_pid = Process.pid
+      puts parent_pid
       cmd = "strace --quiet=attach,exit -f -T -ttt -o #{trace_file.path} -p #{parent_pid}"
       
       strace_proc = spawn(cmd, :out => "/dev/null", :err => "/dev/null")
@@ -130,6 +131,7 @@ module Cirron
         Process.wait(strace_proc) rescue nil
       end
 
+      puts "WAT\n"
       puts trace_file.path
       result = File.open(trace_file.path, 'r') do |file|
         parse_strace(file)
