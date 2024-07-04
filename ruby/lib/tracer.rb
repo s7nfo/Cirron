@@ -125,6 +125,7 @@ module Cirron
         end
 
         puts block_given?
+        sleep 1
 
         yield if block_given?
       ensure
