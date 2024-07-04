@@ -5,10 +5,12 @@ require_relative '../lib/cirron'
 class TestCirron < Minitest::Test
   def test_tracer
     t = Cirron::Tracer.trace do
-      sleep 0.1
+      Tempfile.create('test') do |f|
+        f.write('test')
+        sleep 0.1
+      end
     end
 
-    puts t
     assert_equal 4, t.size
   end
 
