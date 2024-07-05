@@ -105,36 +105,34 @@ def parse_strace(file)
 end
 
 module Cirron
-  class Tracer
-    def self.trace(timeout = 10, &block)
-      trace_file = Tempfile.new('cirron')
-      trace_file.close
-      parent_pid = Process.pid
-      cmd = "strace --quiet=attach,exit -f -T -ttt -o #{trace_file.path} -p #{parent_pid}"
-      
-      strace_proc = spawn(cmd, :out => "/dev/null", :err => "/dev/null")
-      
-      deadline = Time.now + timeout
-      begin
-        until File.exist?(trace_file.path)
-          if Time.now > deadline
-            raise Timeout::Error, "Failed to start strace within #{timeout}s."
-          end
+  def self.tracer(timeout = 10, &block)
+    trace_file = Tempfile.new('cirron')
+    trace_file.close
+    parent_pid = Process.pid
+    cmd = "strace --quiet=attach,exit -f -T -ttt -o #{trace_file.path} -p #{parent_pid}"
+    
+    strace_proc = spawn(cmd, :out => "/dev/null", :err => "/dev/null")
+    
+    deadline = Time.now + timeout
+    begin
+      until File.exist?(trace_file.path)
+        if Time.now > deadline
+          raise Timeout::Error, "Failed to start strace within #{timeout}s."
         end
-
-        yield if block_given?
-      ensure
-        Process.kill('INT', strace_proc) rescue nil
-        Process.wait(strace_proc) rescue nil
       end
 
-      result = File.open(trace_file.path, 'r') do |file|
-        parse_strace(file)
-      end
-
-      trace_file.unlink
-
-      result
+      yield if block_given?
+    ensure
+      Process.kill('INT', strace_proc) rescue nil
+      Process.wait(strace_proc) rescue nil
     end
+
+    result = File.open(trace_file.path, 'r') do |file|
+      parse_strace(file)
+    end
+
+    trace_file.unlink
+
+    result
   end
 end
