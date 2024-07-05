@@ -8,7 +8,6 @@ class TestCirron < Minitest::Test
       sleep 0.1
     end
 
-    puts t
     assert_equal 3, t.size
   end
 

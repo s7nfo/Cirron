@@ -19,10 +19,10 @@ module CirronInterOp
 end
 
 class Counter < FFI::Struct
-  layout :time_enabled_ns, :long_double,
-         :instruction_count, :long_double,
-         :branch_misses, :long_double,
-         :page_faults, :long_double
+  layout :time_enabled_ns, :double,
+         :instruction_count, :double,
+         :branch_misses, :double,
+         :page_faults, :double
 end
 
 module Cirron
