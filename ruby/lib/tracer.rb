@@ -68,8 +68,8 @@ end
 def parse_strace(file)
   syscall_pattern = /^(\d+) +(\d+\.\d+) (\w+)\((.*?)\) += +(.*?) <(.*?)>$/
   signal_pattern = /^(\d+) +(\d+\.\d+) --- (\w+) {(.*)} ---$/
-  unfinished_pattern = /^(\d+) (\d+\.\d+) (\w+)\((.*?) +<unfinished \.\.\.>$/
-  resumed_pattern = /^(\d+) (\d+\.\d+) <\.\.\. (\w+) resumed>(.*?)?\) += +(.*?) <(.*?)>$/
+  unfinished_pattern = /^(\d+) +(\d+\.\d+) (\w+)\((.*?) +<unfinished \.\.\.>$/
+  resumed_pattern = /^(\d+) +(\d+\.\d+) <\.\.\. (\w+) resumed>(.*?)?\) += +(.*?) <(.*?)>$/
 
   result = []
   unfinished_syscalls = {}
