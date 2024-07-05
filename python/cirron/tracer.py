@@ -72,10 +72,10 @@ def parse_strace(f):
     )
     signal_pattern = re.compile(r"^(\d+) +(\d+\.\d+) --- (\w+) {(.*)} ---$")
     unfinished_pattern = re.compile(
-        r"^(\d+) (\d+\.\d+) (\w+)\((.*?) +<unfinished \.\.\.>$"
+        r"^(\d+) +(\d+\.\d+) (\w+)\((.*?) +<unfinished \.\.\.>$"
     )
     resumed_pattern = re.compile(
-        r"^(\d+) (\d+\.\d+) <\.\.\. (\w+) resumed>(.*?)?\) += +(.*?) <(.*?)>$"
+        r"^(\d+) +(\d+\.\d+) <\.\.\. (\w+) resumed>(.*?)?\) += +(.*?) <(.*?)>$"
     )
 
     result = []

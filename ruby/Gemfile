@@ -2,5 +2,3 @@ source 'https://rubygems.org'
 
 gem 'ffi'
 gem 'minitest'
-
-# Add other gems your project depends on
