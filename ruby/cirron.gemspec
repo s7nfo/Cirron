@@ -9,15 +9,14 @@ Gem::Specification.new do |spec|
   spec.authors = ["Matt Stuchlik"]
   spec.email = ["matej.stuchlik@gmail.com"]
 
-  spec.summary = "Cirron measures how many CPU instructions and system calls a piece of Python code executes."
+  spec.summary = "Cirron measures how many CPU instructions and system calls a piece of Ruby code executes."
   spec.description = File.read(File.join(File.dirname(__FILE__), "README.md"))
   spec.homepage = "https://github.com/s7nfo/Cirron"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 2.6.0"
+  spec.required_ruby_version = ">= 3.0.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/s7nfo/Cirron"
-  spec.metadata["changelog_uri"] = "https://github.com/s7nfo/Cirron/blob/main/CHANGELOG.md"
 
   # Specify which files should be added to the gem when it is released.
   # The git ls-files -z loads the files in the RubyGem that have been added into git.
