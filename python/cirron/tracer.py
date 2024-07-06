@@ -134,7 +134,6 @@ def parse_strace(f):
 
 
 def filter_trace(trace, marker_path):
-    print(trace)
     start_index = next(
         (i for i, r in enumerate(trace) if marker_path in getattr(r, "args", "")), None
     )
@@ -194,3 +193,9 @@ class Tracer:
             self.trace = filter_trace(parse_strace(f), self._trace_file + ".dummy")
 
         os.unlink(self._trace_file)
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return repr(self.trace)

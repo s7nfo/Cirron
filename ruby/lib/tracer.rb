@@ -33,38 +33,6 @@ class TraceSignal
   end
 end
 
-def to_tef(parsed_events)
-  events = parsed_events.map do |event|
-    case event
-    when Syscall
-      start_ts = event.timestamp.to_f * 1_000_000
-      duration_us = event.duration.to_f * 1_000_000
-      {
-        name: event.name,
-        ph: "X",
-        ts: start_ts,
-        dur: duration_us,
-        pid: event.pid.to_i,
-        tid: event.pid.to_i,
-        args: { args: event.args, retval: event.retval }
-      }
-    when TraceSignal
-      ts = event.timestamp.to_f * 1_000_000
-      {
-        name: "Signal: #{event.name}",
-        ph: "i",
-        s: "g",
-        ts: ts,
-        pid: event.pid.to_i,
-        tid: event.pid.to_i,
-        args: { details: event.details }
-      }
-    end
-  end
-
-  JSON.pretty_generate(events)
-end
-
 def parse_strace(file)
   syscall_pattern = /^(\d+) +(\d+\.\d+) (\w+)\((.*?)\) += +(.*?) <(.*?)>$/
   signal_pattern = /^(\d+) +(\d+\.\d+) --- (\w+) {(.*)} ---$/
@@ -150,7 +118,7 @@ module Cirron
 
     # Parse the trace file into a list of events
     trace = File.open(trace_file.path, 'r') do |file|
-      parse_strace(trace)
+      parse_strace(file)
     end
 
     trace = filter_trace(trace, trace_file.path + ".dummy")
@@ -158,5 +126,37 @@ module Cirron
     trace_file.unlink
 
     trace
+  end
+
+  def self.to_tef(parsed_events)
+    events = parsed_events.map do |event|
+      case event
+      when Syscall
+        start_ts = event.timestamp.to_f * 1_000_000
+        duration_us = event.duration.to_f * 1_000_000
+        {
+          name: event.name,
+          ph: "X",
+          ts: start_ts,
+          dur: duration_us,
+          pid: event.pid.to_i,
+          tid: event.pid.to_i,
+          args: { args: event.args, retval: event.retval }
+        }
+      when TraceSignal
+        ts = event.timestamp.to_f * 1_000_000
+        {
+          name: "Signal: #{event.name}",
+          ph: "i",
+          s: "g",
+          ts: ts,
+          pid: event.pid.to_i,
+          tid: event.pid.to_i,
+          args: { details: event.details }
+        }
+      end
+    end
+
+    JSON.pretty_generate(events)
   end
 end

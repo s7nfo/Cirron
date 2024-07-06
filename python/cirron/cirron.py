@@ -101,3 +101,9 @@ class Collector:
                     )
                 else:
                     setattr(self.counters, field, 0)
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return repr(self.counters)
