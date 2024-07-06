@@ -1,11 +1,12 @@
 
 # frozen_string_literal: true
 
-require_relative "lib/cirron/version"
+require 'fileutils'
+require 'pathname'
 
 Gem::Specification.new do |spec|
   spec.name = "cirron"
-  spec.version = Cirron::VERSION
+  spec.version = "0.2.1"
   spec.authors = ["Matt Stuchlik"]
   spec.email = ["matej.stuchlik@gmail.com"]
 
@@ -18,13 +19,17 @@ Gem::Specification.new do |spec|
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/s7nfo/Cirron"
 
-  # Specify which files should be added to the gem when it is released.
-  # The git ls-files -z loads the files in the RubyGem that have been added into git.
-  spec.files = Dir.chdir(__dir__) do
-    git ls-files -z.split("\x0").reject do |f|
-      (f == __FILE__) || f.match(%r{\A(?:(?:bin|test|spec|features)/|\.(?:git|travis|circleci)|appveyor)})
-    end
-  end
+  spec.files = [
+    "lib/apple_arm_events.h",
+    "lib/cirron.rb",
+    "lib/cirronlib.cpp",
+    "lib/collector.rb",
+    "lib/tracer.rb",
+    "README.md",
+    "LICENSE",
+    "cirron.gemspec"
+  ]
+
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
