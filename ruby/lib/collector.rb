@@ -23,6 +23,26 @@ class Counter < FFI::Struct
          :instruction_count, :uint64,
          :branch_misses, :uint64,
          :page_faults, :uint64
+
+  def self.create_accessors
+    layout.members.each do |field|
+      define_method(field) { self[field] }
+      define_method("#{field}=") { |value| self[field] = value }
+    end
+  end
+
+  create_accessors
+
+  def to_s
+    inspect
+  end
+
+  def inspect
+    fields = self.class.layout.members.map do |field|
+      "#{field}: #{self[field]}"
+    end
+    "Counter(#{fields.join(', ')})"
+  end
 end
 
 module Cirron

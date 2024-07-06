@@ -133,6 +133,29 @@ def parse_strace(f):
     return result
 
 
+def filter_trace(trace, marker_path):
+    print(trace)
+    start_index = next(
+        (i for i, r in enumerate(trace) if marker_path in getattr(r, "args", "")), None
+    )
+    end_index = next(
+        (
+            i
+            for i in range(len(trace) - 1, -1, -1)
+            if marker_path in getattr(trace[i], "args", "")
+        ),
+        None,
+    )
+
+    if start_index is not None and end_index is not None:
+        return trace[start_index + 1 : end_index]
+    else:
+        print(
+            "Failed to find start and end markers for the trace, returning the full trace."
+        )
+        return trace
+
+
 class Tracer:
     def __enter__(self, timeout=10):
         parent_pid = os.getpid()
@@ -146,13 +169,25 @@ class Tracer:
             if time.monotonic() > deadline:
                 raise TimeoutError(f"Failed to start strace within {timeout}s.")
 
+        try:
+            # We use this dummy fstat to recognize when we start executing the block
+            os.stat(self._trace_file + ".dummy")
+        except:
+            pass
+
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        try:
+            # Same here, to recognize when we're done executing the block
+            os.stat(self._trace_file + ".dummy")
+        except:
+            pass
+
         self._strace_proc.terminate()
         self._strace_proc.wait()
 
         with open(self._trace_file, "r") as f:
-            self.trace = parse_strace(f)
+            self.trace = filter_trace(parse_strace(f), self._trace_file + ".dummy")
 
         os.unlink(self._trace_file)

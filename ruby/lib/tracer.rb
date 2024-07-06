@@ -104,6 +104,18 @@ def parse_strace(file)
   result
 end
 
+def filter_trace(trace, marker_path)
+  start_index = trace.index { |event| event.args.include?(marker_path) }
+  end_index = trace.rindex { |event| event.args.include?(marker_path) }
+
+  if start_index && end_index
+    trace[start_index + 1...end_index]
+  else
+    puts "Failed to find start and end markers for the trace, returning the full trace."
+    trace
+  end
+end
+
 module Cirron
   def self.tracer(timeout = 10, &block)
     trace_file = Tempfile.new('cirron')
@@ -120,19 +132,29 @@ module Cirron
           raise Timeout::Error, "Failed to start strace within #{timeout}s."
         end
       end
+      # :(
+      sleep 0.1
+
+      # We use this dummy fstat to recognize when we start executing the block
+      File.stat(trace_file.path + ".dummy") rescue nil
 
       yield if block_given?
+
+      # Same here, to recognize when we're done executing the block
+      File.stat(trace_file.path + ".dummy") rescue nil
     ensure
       Process.kill('INT', strace_proc) rescue nil
       Process.wait(strace_proc) rescue nil
     end
 
-    result = File.open(trace_file.path, 'r') do |file|
-      parse_strace(file)
+    trace = File.open(trace_file.path, 'r') do |file|
+      parse_strace(trace)
     end
+
+    trace = filter_trace(trace, trace_file.path + ".dummy")
 
     trace_file.unlink
 
-    result
+    trace
   end
 end
