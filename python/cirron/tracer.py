@@ -164,10 +164,13 @@ class Tracer:
         cmd = f"strace --quiet=attach,exit -f -T -ttt -o {self._trace_file} -p {parent_pid}".split()
         self._strace_proc = subprocess.Popen(cmd)
 
+        # Wait for the trace file to be created
         deadline = time.monotonic() + timeout
         while not os.path.exists(self._trace_file):
             if time.monotonic() > deadline:
                 raise TimeoutError(f"Failed to start strace within {timeout}s.")
+        # :(
+        time.sleep(0.1)
 
         try:
             # We use this dummy fstat to recognize when we start executing the block

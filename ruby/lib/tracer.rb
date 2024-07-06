@@ -125,6 +125,7 @@ module Cirron
     
     strace_proc = spawn(cmd, :out => "/dev/null", :err => "/dev/null")
     
+    # Wait for the trace file to be created
     deadline = Time.now + timeout
     begin
       until File.exist?(trace_file.path)
@@ -147,6 +148,7 @@ module Cirron
       Process.wait(strace_proc) rescue nil
     end
 
+    # Parse the trace file into a list of events
     trace = File.open(trace_file.path, 'r') do |file|
       parse_strace(trace)
     end
