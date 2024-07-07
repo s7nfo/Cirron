@@ -7,7 +7,7 @@ long_description = (Path(__file__).parent / "README.md").read_text()
 
 setup(
     name="Cirron",
-    version="0.2.1",
+    version="0.3",
     packages=find_packages(),
     package_data={
         "cirron": ["cirronlib.cpp", "apple_arm_events.h", "tracer.py", "cirron.py"],

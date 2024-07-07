@@ -6,7 +6,7 @@ require 'pathname'
 
 Gem::Specification.new do |spec|
   spec.name = "cirron"
-  spec.version = "0.2.9"
+  spec.version = "0.3"
   spec.authors = ["Matt Stuchlik"]
   spec.email = ["matej.stuchlik@gmail.com"]
 
@@ -33,10 +33,4 @@ Gem::Specification.new do |spec|
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-
-  # Uncomment to register a new dependency of your gem
-  # spec.add_dependency "example-gem", "~> 1.0"
-
-  # For more information and examples about making a new gem, check out our
-  # guide at: https://bundler.io/guides/creating_gem.html
 end
