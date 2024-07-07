@@ -2,6 +2,8 @@ require 'minitest/autorun'
 require 'tempfile'
 require_relative '../lib/cirron'
 
+IN_GITHUB_ACTIONS = ENV['POWERSHELL_DISTRIBUTION_CHANNEL']&.start_with?('GitHub')
+
 class TestCirron < Minitest::Test
   def test_tracer
     trace = Cirron::tracer do
@@ -12,7 +14,7 @@ class TestCirron < Minitest::Test
   end
 
   def test_collector
-    if ENV['POWERSHELL_DISTRIBUTION_CHANNEL']&.start_with?('GitHub')
+    if IN_GITHUB_ACTIONS
       skip 'As of 02/07/2024, GitHub Actions does not support perf_event_open.'
     end
 
@@ -20,6 +22,18 @@ class TestCirron < Minitest::Test
       puts 0
     end
 
-    assert_operator counters[:instruction_count], :>, 0
+    assert_operator counters[:instruction_count], :>, 100
+  end
+
+  def test_collector_empty
+    if IN_GITHUB_ACTIONS
+      skip 'As of 02/07/2024, GitHub Actions does not support perf_event_open.'
+    end
+
+    counters = Cirron::collector {}
+
+    # Unlike the Pyton implementation, the Ruby implementation does not
+    # reduce the overhead to zero.
+    assert_operator counters[:instruction_count], :<, 100
   end
 end

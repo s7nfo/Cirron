@@ -73,8 +73,8 @@ def parse_strace(file)
 end
 
 def filter_trace(trace, marker_path)
-  start_index = trace.index { |event| event.args.include?(marker_path) }
-  end_index = trace.rindex { |event| event.args.include?(marker_path) }
+  start_index = trace.index { |event| event.is_a?(Syscall) && event.args.include?(marker_path) }
+  end_index = trace.rindex { |event| event.is_a?(Syscall) && event.args.include?(marker_path) }
 
   if start_index && end_index
     trace[start_index + 1...end_index]

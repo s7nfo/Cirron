@@ -46,6 +46,19 @@ class Counter < FFI::Struct
 end
 
 module Cirron
+  @overhead = {}
+
+  def self.calculate_overhead
+    puts "Measuring overhead..."
+    10.times do
+      counter = collector(measure_overhead: false) {}
+      Counter.members.each do |field|
+        @overhead[field] = [@overhead[field], counter[field]].compact.min
+      end
+    end
+    puts @overhead
+  end
+
   def self.start
     ret_val = CirronInterOp.start
     if ret_val == -1
@@ -58,13 +71,22 @@ module Cirron
     CirronInterOp.end(fd, counter)
   end
 
-  def self.collector(&blk)
+  def self.collector(measure_overhead: true, &blk)
+    calculate_overhead if measure_overhead && @overhead.empty?
+
     counter = Counter.new
     ret_val = self.start
 
     yield
 
     self.end(ret_val, counter)
+
+    if measure_overhead && !@overhead.empty?
+      Counter.members.each do |field|
+        counter[field] = [counter[field] - @overhead[field], 0].max
+      end
+    end
+
     counter
   end
 end

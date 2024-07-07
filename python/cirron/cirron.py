@@ -57,6 +57,7 @@ class Collector:
     def __init__(self, measure_overhead=True):
         self._fd = None
         self.counters = Counter()
+        self.measure_overhead = measure_overhead
 
         # We try to estimate what the overhead of the collector is, taking the minimum
         # of 10 runs.
@@ -90,7 +91,7 @@ class Collector:
             raise Exception("Failed to end collector.")
 
         global overhead
-        if overhead:
+        if self.measure_overhead and overhead:
             for field, _ in Counter._fields_:
                 # Clamp the result of overhead substraction to 0.
                 if getattr(self.counters, field) > overhead[field]:
