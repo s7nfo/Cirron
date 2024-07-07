@@ -16,20 +16,19 @@ It can also trace syscalls using +strace+, Linux only!
 
 === Performance Counters
   $ sudo irb
-  irb> require 'cirron'
-
-  # Start collecting performance metrics
-  irb> counters = Cirron::collector do
-  irb>  # Your code here
-  irb>  puts "Hello"
-  irb> end
-  => Counter(time_enabled_ns: 0, instruction_count: 39066, branch_misses: 546, page_faults: 0)
+  irb(main):001> require 'cirron'
+  => true
+  irb(main):002* c = Cirron::collector do
+  irb(main):003*   puts "Hello"
+  irb(main):004> end
+  Hello
+  => Counter(time_enabled_ns: 110260, instruction_count: 15406, branch_misses: 525, page_faults: 0)
 
 === Syscalls
 
   $ sudo irb
   irb> require 'cirron'
-
+  => true
   irb> trace = Cirron::tracer do
   irb>  # Your code here
   irb>  puts "Hello"

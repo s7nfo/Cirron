@@ -13,11 +13,13 @@ It can also trace syscalls using `strace`, Linux only!
 ## Installation
 
 ### Python
+
 ```bash
 pip install cirron
 ```
 
 ### Ruby
+
 ```bash
 gem install cirron
 ```
@@ -58,7 +60,9 @@ Hello
 ```
 
 ### Syscalls
+
 #### Python
+
 ```
 $ sudo python
 >>> from cirron import Tracer, to_tef
@@ -75,6 +79,7 @@ $ sudo python
 >>> open("/tmp/trace", "w").write(to_tef(tracer.trace))
 ```
 #### Ruby
+
 ```
 $ sudo irb
 irb> require 'cirron'
