@@ -44,6 +44,9 @@ if not os.path.exists(lib_path):
         )
 
 
+overhead = {}
+
+
 class Collector:
     cirron_lib = CDLL(lib_path)
     cirron_lib.start.argtypes = None
@@ -51,14 +54,33 @@ class Collector:
     cirron_lib.end.argtypes = [c_int, POINTER(Counter)]
     cirron_lib.end.restype = None
 
-    def __init__(self):
+    def __init__(self, measure_overhead=True):
         self._fd = None
         self.counters = Counter()
+        self.measure_overhead = measure_overhead
+
+        # We try to estimate what the overhead of the collector is, taking the minimum
+        # of 10 runs.
+        global overhead
+        if measure_overhead and not overhead:
+            for _ in range(10):
+                with Collector(measure_overhead=False) as collector:
+                    pass
+
+                for field, _ in Counter._fields_:
+                    if field not in overhead:
+                        overhead[field] = getattr(collector.counters, field)
+                    else:
+                        overhead[field] = min(
+                            overhead[field], getattr(collector.counters, field)
+                        )
 
     def __enter__(self):
         ret_val = Collector.cirron_lib.start()
         if ret_val == -1:
-            raise Exception("Failed to start collector. Make sure you have the right permissions, you might need to use sudo.")
+            raise Exception(
+                "Failed to start collector. Make sure you have the right permissions, you might need to use sudo."
+            )
         self._fd = ret_val
 
         return self
@@ -69,7 +91,7 @@ class Collector:
             raise Exception("Failed to end collector.")
 
         global overhead
-        if overhead:
+        if self.measure_overhead and overhead:
             for field, _ in Counter._fields_:
                 # Clamp the result of overhead substraction to 0.
                 if getattr(self.counters, field) > overhead[field]:
@@ -81,20 +103,8 @@ class Collector:
                 else:
                     setattr(self.counters, field, 0)
 
+    def __str__(self):
+        return self.__repr__()
 
-# We try to estimate what the overhead of the collector is, taking the minimum
-# of 10 runs.
-overhead = {}
-collector = Collector()
-o = {}
-for _ in range(10):
-    with Collector() as collector:
-        pass
-
-    for field, _ in Counter._fields_:
-        if field not in overhead:
-            o[field] = getattr(collector.counters, field)
-        else:
-            o[field] = min(overhead[field], getattr(collector.counters, field))
-overhead = o
-del collector
+    def __repr__(self):
+        return repr(self.counters)

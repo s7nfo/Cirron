@@ -3,6 +3,7 @@ import os
 import subprocess
 import re
 import json
+import time
 from dataclasses import dataclass
 
 
@@ -66,13 +67,15 @@ class Signal:
 
 
 def parse_strace(f):
-    syscall_pattern = re.compile(r"^(\d+) (\d+\.\d+) (\w+)\((.*?)\) += +(.*?) <(.*?)>$")
-    signal_pattern = re.compile(r"^(\d+) (\d+\.\d+) --- (\w+) {(.*)} ---$")
+    syscall_pattern = re.compile(
+        r"^(\d+) +(\d+\.\d+) (\w+)\((.*?)\) += +(.*?) <(.*?)>$"
+    )
+    signal_pattern = re.compile(r"^(\d+) +(\d+\.\d+) --- (\w+) {(.*)} ---$")
     unfinished_pattern = re.compile(
-        r"^(\d+) (\d+\.\d+) (\w+)\((.*?) +<unfinished \.\.\.>$"
+        r"^(\d+) +(\d+\.\d+) (\w+)\((.*?) +<unfinished \.\.\.>$"
     )
     resumed_pattern = re.compile(
-        r"^(\d+) (\d+\.\d+) <\.\.\. (\w+) resumed>(.*?)?\) += +(.*?) <(.*?)>$"
+        r"^(\d+) +(\d+\.\d+) <\.\.\. (\w+) resumed>(.*?)?\) += +(.*?) <(.*?)>$"
     )
 
     result = []
@@ -130,24 +133,69 @@ def parse_strace(f):
     return result
 
 
+def filter_trace(trace, marker_path):
+    start_index = next(
+        (i for i, r in enumerate(trace) if marker_path in getattr(r, "args", "")), None
+    )
+    end_index = next(
+        (
+            i
+            for i in range(len(trace) - 1, -1, -1)
+            if marker_path in getattr(trace[i], "args", "")
+        ),
+        None,
+    )
+
+    if start_index is not None and end_index is not None:
+        return trace[start_index + 1 : end_index]
+    else:
+        print(
+            "Failed to find start and end markers for the trace, returning the full trace."
+        )
+        return trace
+
+
 class Tracer:
-    def __enter__(self):
+    def __enter__(self, timeout=10):
         parent_pid = os.getpid()
         self._trace_file = tempfile.mktemp()
 
         cmd = f"strace --quiet=attach,exit -f -T -ttt -o {self._trace_file} -p {parent_pid}".split()
         self._strace_proc = subprocess.Popen(cmd)
 
+        # Wait for the trace file to be created
+        deadline = time.monotonic() + timeout
         while not os.path.exists(self._trace_file):
+            if time.monotonic() > deadline:
+                raise TimeoutError(f"Failed to start strace within {timeout}s.")
+        # :(
+        time.sleep(0.1)
+
+        try:
+            # We use this dummy fstat to recognize when we start executing the block
+            os.stat(self._trace_file + ".dummy")
+        except:
             pass
 
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        try:
+            # Same here, to recognize when we're done executing the block
+            os.stat(self._trace_file + ".dummy")
+        except:
+            pass
+
         self._strace_proc.terminate()
         self._strace_proc.wait()
 
         with open(self._trace_file, "r") as f:
-            self.trace = parse_strace(f)
+            self.trace = filter_trace(parse_strace(f), self._trace_file + ".dummy")
 
         os.unlink(self._trace_file)
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return repr(self.trace)

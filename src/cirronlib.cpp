@@ -7,11 +7,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#ifdef __linux__
+#if defined(__linux__)
 #include <linux/perf_event.h>
-#endif
-
-#if __APPLE__ && __aarch64__
+#elif defined(__APPLE__)
 #include "apple_arm_events.h"
 #endif
 
@@ -29,7 +27,7 @@ extern "C"
     int end(int fd, struct counter *out);
 }
 
-#ifdef __linux__
+#if defined(__linux__)
 struct read_format
 {
     uint64_t nr;
@@ -56,16 +54,14 @@ struct perf_event_config events[] = {
 };
 
 const int NUM_EVENTS = sizeof(events) / sizeof(events[0]);
-#endif
-
-#if __APPLE__ && __aarch64__
+#elif defined(__APPLE__)
 u64 counters_0[KPC_MAX_COUNTERS] = {0};
 usize counter_map[KPC_MAX_COUNTERS] = {0};
 #endif
 
 int start()
 {
-#ifdef __linux__
+#if defined(__linux__)
     // Construct base perf_event_attr struct
     struct perf_event_attr attr;
     memset(&attr, 0, sizeof(attr));
@@ -108,8 +104,7 @@ int start()
     }
 
     return leader_fd;
-#endif
-#if __APPLE__ && __aarch64__
+#elif defined(__APPLE__)
     // load dylib
     if (!lib_init())
     {
@@ -239,12 +234,15 @@ int start()
     }
 
     return 0;
+#else
+    printf("This systems seems to be neither Linux, nor ARM OSX, so I don't know how to proceeed.\nIf this is a mistake, please open an issue on the GitHub repository.\n");
+    return -1;
 #endif
 }
 
 int end(int fd, struct counter *out)
 {
-#ifdef __linux__
+#if defined(__linux__)
     if (out == NULL)
     {
         fprintf(stderr, "Error: 'out' pointer is NULL in end().\n");
@@ -297,8 +295,7 @@ int end(int fd, struct counter *out)
     close(fd);
     free(buffer);
     return 0;
-#endif
-#if __APPLE__ && __aarch64__
+#elif defined(__APPLE__)
     // get counters after
     int ret = 0;
     u64 counters_1[KPC_MAX_COUNTERS] = {0};
@@ -317,5 +314,8 @@ int end(int fd, struct counter *out)
     out->page_faults = 0;
     out->branch_misses = counters_1[counter_map[3]] - counters_0[counter_map[3]];
     return 0;
+#else
+    printf("This systems seems to be neither Linux, nor OSX, so I don't know how to proceeed.\nIf this is a mistake, please open an issue on the GitHub repository.\n");
+    return -1;
 #endif
 }
