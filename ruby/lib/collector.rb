@@ -49,14 +49,12 @@ module Cirron
   @overhead = {}
 
   def self.calculate_overhead
-    puts "Measuring overhead..."
     10.times do
       counter = collector(measure_overhead: false) {}
       Counter.members.each do |field|
         @overhead[field] = [@overhead[field], counter[field]].compact.min
       end
     end
-    puts @overhead
   end
 
   def self.start
