@@ -1,17 +1,16 @@
 use libloading::{Library, Symbol};
-use cty;
+use std::os::raw::{c_int, c_ulonglong};
 
 const CIRRONLIB: &str = "./cirronlib.so";
 // this means its in rust/cirronlib.so
 
-#[repr(C)]
-#[derive(Default)]
-#[derive(Debug)]
+#[repr(C, align(8))]
+#[derive(Default, Debug)]
 pub struct Counter {
-  pub time_enabled_ns: cty::c_ulong,
-  pub instruction_count: cty::c_ulong,
-  pub branch_misses: cty::c_ulong,
-  pub page_faults: cty::c_ulong
+  pub time_enabled_ns: c_ulonglong,
+  pub instruction_count: c_ulonglong,
+  pub branch_misses: c_ulonglong,
+  pub page_faults: c_ulonglong
 }
 
 fn get_cirronlib() -> Library {
@@ -21,26 +20,27 @@ fn get_cirronlib() -> Library {
   }
 }
 
-fn start() -> Result<u32, Box<dyn std::error::Error>> {
+fn start() -> Result<c_int, Box<dyn std::error::Error>> {
   let lib = get_cirronlib();
   unsafe {
-    let start: Symbol<unsafe extern fn() -> u32> = lib.get(b"start").unwrap();
+    let start: Symbol<unsafe extern fn() -> c_int> = lib.get(b"start").unwrap();
     Ok(start())
   }
 }
 
-fn end(fd: u32, counter: &mut Counter) -> Result<u32, Box<dyn std::error::Error>> {
+fn end(fd: c_int, counter: &mut Counter) -> Result<c_int, Box<dyn std::error::Error>> {
   let lib = get_cirronlib();
 
   unsafe {
-    let end: Symbol<unsafe extern fn(u32, *mut Counter) -> u32> = lib.get(b"end").unwrap();
-    Ok(end(fd, counter))
+    let end_c: Symbol<unsafe extern fn(c_int, *mut Counter) -> c_int> = lib.get(b"end").unwrap();
+    Ok(end_c(fd, counter as *mut Counter))
   }
 }
 
 pub fn main() {
 
-  let mut counter = Counter { ..Default::default() };
+  let mut counter = Counter::default();
+  println!("{:#?}", counter);
 
   let result = start().unwrap();
   println!("Hello");
