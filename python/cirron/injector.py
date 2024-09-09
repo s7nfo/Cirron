@@ -23,7 +23,7 @@ class Injector:
     def __init__(self):
         self.rules = []
 
-    def add_rule(self, syscall, action, value, when=None):
+    def inject(self, syscall, action, value, when=None):
         if action not in self.VALID_ACTIONS:
             raise ValueError(
                 f"Invalid action: {action}. Valid actions are: {', '.join(self.VALID_ACTIONS)}"

@@ -43,7 +43,7 @@ end
 class TestInjector < Minitest::Test
   def test_injector
     injector = Cirron.injector
-    injector.add_rule("openat", "error", "ENOSPC")
+    injector.inject("openat", "error", "ENOSPC")
 
     assert_raises(Errno::ENOSPC) do
       injector.run do

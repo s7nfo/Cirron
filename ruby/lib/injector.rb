@@ -14,7 +14,7 @@ module Cirron
       @rules = []
     end
 
-    def add_rule(syscall, action, value, when_condition = nil)
+    def inject(syscall, action, value, when_condition = nil)
       unless VALID_ACTIONS.include?(action)
         raise ArgumentError, "Invalid action: #{action}. Valid actions are: #{VALID_ACTIONS.join(', ')}"
       end

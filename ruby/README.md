@@ -24,7 +24,7 @@ It can also trace syscalls using +strace+, Linux only!
   Hello
   => Counter(time_enabled_ns: 110260, instruction_count: 15406, branch_misses: 525, page_faults: 0)
 
-=== Syscalls
+=== Tracing Syscalls
 
   $ sudo irb
   irb> require 'cirron'
@@ -37,6 +37,35 @@ It can also trace syscalls using +strace+, Linux only!
   # Save the trace for ingesting to Perfetto
   irb> File.write("/tmp/trace", Cirron::to_tef(trace))
   => 267
+
+=== Tampering with Syscalls
+
+Available tampering actions are:
+error: Inject a fault with the specified errno.
+retval: Inject a success with the specified return value.
+signal: Deliver the specified signal on syscall entry.
+delay_enter: Delay syscall entry by the specified time.
+delay_exit: Delay syscall exit by the specified time.
+poke_enter: Modify memory at argN on syscall entry.
+poke_exit: Modify memory at argN on syscall exit.
+syscall: Inject a different syscall instead.
+
+The when argument can be used to specify when to perform the tampering.
+
+See the Tampering section of the [strace manual page](https://man7.org/linux/man-pages/man1/strace.1.html) for more detailed explanaition of the arguments.
+
+```
+$ sudo irb
+irb> require 'cirron'
+
+irb> injector = Cirron.injector
+irb> injector.inject("openat", "error", "ENOSPC")
+irb> injector.inject("openat", "delay_enter", "1s", when="2+2")
+irb> injector.run do
+irb>     # Open now fails with "No space left on device" and every
+irb>     # other call to `openat` will be delayed by 1s.
+irb>     File.open("test.txt", "w")
+```
 
 == Additional Information
 

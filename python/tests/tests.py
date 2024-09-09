@@ -46,7 +46,7 @@ class TestCollector(unittest.TestCase):
 class TestInjector(unittest.TestCase):
     def test_injector(self):
         injector = Injector()
-        injector.add_rule("openat", "error", "ENOSPC")
+        injector.inject("openat", "error", "ENOSPC")
         with injector:
             with self.assertRaises(OSError) as cm:
                 f = open("test.txt", "w")
