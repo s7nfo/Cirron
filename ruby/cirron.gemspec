@@ -6,7 +6,7 @@ require 'pathname'
 
 Gem::Specification.new do |spec|
   spec.name = "cirron"
-  spec.version = "0.3.1"
+  spec.version = "0.4.0"
   spec.authors = ["Matt Stuchlik"]
   spec.email = ["matej.stuchlik@gmail.com"]
 
@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
     "lib/cirronlib.cpp",
     "lib/collector.rb",
     "lib/tracer.rb",
+    "lib/injector.rb",
     "README.md",
     "LICENSE",
     "cirron.gemspec"

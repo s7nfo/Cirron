@@ -7,10 +7,16 @@ long_description = (Path(__file__).parent / "README.md").read_text()
 
 setup(
     name="Cirron",
-    version="0.3",
+    version="0.4",
     packages=find_packages(),
     package_data={
-        "cirron": ["cirronlib.cpp", "apple_arm_events.h", "tracer.py", "cirron.py"],
+        "cirron": [
+            "cirronlib.cpp",
+            "apple_arm_events.h",
+            "tracer.py",
+            "cirron.py",
+            "injector.py",
+        ],
     },
     author="Matt Stuchlik",
     author_email="matej.stuchlik@gmail.com",
