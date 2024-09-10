@@ -60,11 +60,12 @@ irb> require 'cirron'
 
 irb> injector = Cirron.injector
 irb> injector.inject("openat", "error", "ENOSPC")
-irb> injector.inject("openat", "delay_enter", "1s", when="2+2")
+irb> injector.inject("openat", "delay_enter", "1s", when_condition="2+2")
 irb> injector.run do
 irb>     # Open now fails with "No space left on device" and every
 irb>     # other call to `openat` will be delayed by 1s.
 irb>     File.open("test.txt", "w")
+irb> end
 ```
 
 == Additional Information

@@ -24,10 +24,12 @@ module Cirron
 
     def run(timeout = 10)
       trace_file = Tempfile.new('cirron_inject')
+      trace_file_path = trace_file.path
       trace_file.close
+      trace_file.unlink
       parent_pid = Process.pid
 
-      cmd = ["strace", "--quiet=attach,exit", "-f", "-o", trace_file.path, "-p", parent_pid.to_s]
+      cmd = ["strace", "--quiet=attach,exit", "-f", "-o", trace_file_path, "-p", parent_pid.to_s]
 
       @rules.each do |rule|
         inject_arg = "inject=#{rule.syscall}:#{rule.action}=#{rule.value}"
@@ -35,13 +37,11 @@ module Cirron
         cmd.concat(["-e", inject_arg])
       end
 
-      strace_proc = nil
+      strace_proc = spawn(*cmd, :out => "/dev/null", :err => "/dev/null")
 
       begin
-        strace_proc = spawn(*cmd, :out => "/dev/null", :err => "/dev/null")
-
         deadline = Time.now + timeout
-        until File.exist?(trace_file.path)
+        until File.exist?(trace_file_path)
           if Time.now > deadline
             raise Timeout::Error, "Failed to start strace within #{timeout}s."
           end
@@ -54,7 +54,6 @@ module Cirron
       ensure
         Process.kill('INT', strace_proc) rescue nil
         Process.wait(strace_proc) rescue nil
-        trace_file.unlink
       end
     end
   end
