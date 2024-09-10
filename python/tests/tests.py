@@ -1,8 +1,9 @@
 import unittest
 import os
 import time
+import errno
 
-from cirron import Tracer, Collector
+from cirron import Tracer, Collector, Injector
 
 # GITHUB_ACTIONS "should" be defined, but turns out it's not.
 IN_GITHUB_ACTIONS = os.getenv("POWERSHELL_DISTRIBUTION_CHANNEL") and os.getenv(
@@ -10,13 +11,15 @@ IN_GITHUB_ACTIONS = os.getenv("POWERSHELL_DISTRIBUTION_CHANNEL") and os.getenv(
 ).startswith("GitHub")
 
 
-class Test(unittest.TestCase):
+class TestTracer(unittest.TestCase):
     def test_tracer(self):
         with Tracer() as t:
             time.sleep(0.1)
 
         self.assertEqual(len(t.trace), 1)
 
+
+class TestCollector(unittest.TestCase):
     @unittest.skipIf(
         IN_GITHUB_ACTIONS,
         "As of 02/07/2024, GitHub Actions does not support perf_event_open.",
@@ -38,3 +41,17 @@ class Test(unittest.TestCase):
             pass
 
         self.assertEqual(c.counters.instruction_count, 0)
+
+
+class TestInjector(unittest.TestCase):
+    def test_injector(self):
+        injector = Injector()
+        injector.inject("openat", "error", "ENOSPC")
+        with injector:
+            with self.assertRaises(OSError) as cm:
+                f = open("test.txt", "w")
+
+            # Check if the error code matches ENOSPC
+            self.assertEqual(cm.exception.errno, errno.ENOSPC)
+            # Optionally, check the error message
+            self.assertIn("No space left on device", str(cm.exception))
