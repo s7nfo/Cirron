@@ -97,14 +97,23 @@ irb> File.write("/tmp/trace", Cirron::to_tef(trace))
 ### Tampering with Syscalls
 
 Available tampering actions are:
+
 `error`: Inject a fault with the specified errno.
+
 `retval`: Inject a success with the specified return value.
+
 `signal`: Deliver the specified signal on syscall entry.
+
 `delay_enter`: Delay syscall entry by the specified time.
+
 `delay_exit`: Delay syscall exit by the specified time.
+
 `poke_enter`: Modify memory at argN on syscall entry.
+
 `poke_exit`: Modify memory at argN on syscall exit.
+
 `syscall`: Inject a different syscall instead.
+
 
 The `when` argument can be used to specify when to perform the tampering.
 
